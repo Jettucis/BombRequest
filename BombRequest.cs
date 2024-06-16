@@ -14,7 +14,7 @@ public class BombRequest : BasePlugin
   public override string ModuleName => "Bomb Request";
   public override string ModuleAuthor => "Jetta";
   public override string ModuleDescription => "Allows players to be the bomb carrier on the next round";
-  public override string ModuleVersion => "0.0.1a";
+  public override string ModuleVersion => "0.0.2a";
 
   private List<CCSPlayerController> _potentialPlayers = new List<CCSPlayerController>();
   private bool _canUseRB = false;
@@ -90,7 +90,8 @@ public class BombRequest : BasePlugin
     if (bombCarrier == targetPlayer)
     {
       TextToChat(targetPlayer, $"{ChatColors.Lime} Now that's a coincidence. You got the bomb already. Removing you from the RB list.");
-      _potentialPlayers.Remove(targetPlayer);
+      InformRBLoosers(_potentialPlayers);
+      _potentialPlayers.Clear();
       return;
     }
 
@@ -105,18 +106,7 @@ public class BombRequest : BasePlugin
 
     GiveBombToPlayer(targetPlayer);
     _potentialPlayers.Remove(targetPlayer);
-    
-    // Inform others about their bad luck (if there's any)
-    if (_potentialPlayers.Count > 0)
-    {
-      foreach (var gamer in _potentialPlayers)
-      {
-        if (gamer.IsConnected())
-        {
-          TextToChat(gamer, $"{ChatColors.Gold} No luck this round. Write{ChatColors.White} !rb{ChatColors.Gold} to try again.");
-        }
-      }
-    }
+    InformRBLoosers(_potentialPlayers);
     
     // 0.0.1 - Don't want that the same player participating in the next round if I just keep the list, so just clear it, so everyone can write !rb again for next round
     // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
@@ -239,6 +229,17 @@ public class BombRequest : BasePlugin
     {
       Console.WriteLine("[BombRequest] Error in GetRandomPlayer: " + ex.Message);
       return null;
+    }
+  }
+  private void InformRBLoosers(List<CCSPlayerController> players)
+  {
+    if (_potentialPlayers.Count == 0) return;
+    foreach (var gamer in players)
+    {
+      if (gamer.IsConnected())
+      {
+        TextToChat(gamer, $"{ChatColors.Gold} No luck this round. Write{ChatColors.White} !rb{ChatColors.Gold} to try again.");
+      }
     }
   }
   // ------------------- Utils/Statics ------------------- //
