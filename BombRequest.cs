@@ -90,6 +90,7 @@ public class BombRequest : BasePlugin
     if (bombCarrier == targetPlayer)
     {
       TextToChat(targetPlayer, $"{ChatColors.Lime} Now that's a coincidence. You got the bomb already. Removing you from the RB list.");
+      _potentialPlayers.Remove(targetPlayer);
       InformRBLoosers(_potentialPlayers);
       _potentialPlayers.Clear();
       return;
