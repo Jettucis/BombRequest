@@ -90,9 +90,7 @@ public class BombRequest : BasePlugin
     if (bombCarrier == targetPlayer)
     {
       TextToChat(targetPlayer, $"{ChatColors.Lime} Now that's a coincidence. You got the bomb already. Removing you from the RB list.");
-      _potentialPlayers.Remove(targetPlayer);
-      InformRBLoosers(_potentialPlayers);
-      _potentialPlayers.Clear();
+      RBOnRoundStart_Cleanup(targetPlayer);
       return;
     }
 
@@ -106,11 +104,14 @@ public class BombRequest : BasePlugin
     }
 
     GiveBombToPlayer(targetPlayer);
-    _potentialPlayers.Remove(targetPlayer);
-    InformRBLoosers(_potentialPlayers);
-    
     // 0.0.1 - Don't want that the same player participating in the next round if I just keep the list, so just clear it, so everyone can write !rb again for next round
     // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
+    RBOnRoundStart_Cleanup(targetPlayer);
+  }
+  private void RBOnRoundStart_Cleanup(CCSPlayerController player)
+  {
+    _potentialPlayers.Remove(player);
+    InformRBLoosers(_potentialPlayers);
     _potentialPlayers.Clear();
   }
   private CCSPlayerController? CheckWhoHasBomb(List<CCSPlayerController> players)
