@@ -17,6 +17,7 @@ public class BombRequest : BasePlugin
   public override string ModuleVersion => "0.0.2a";
 
   private List<CCSPlayerController> _potentialPlayers = new List<CCSPlayerController>();
+  //private List<RBPlayer> _playersInCooldown = new List<RBPlayer>();
   private bool _canUseRB = false;
   private bool _isWarmup = false;
 
@@ -378,3 +379,26 @@ public static class Lib
   // Readonly's, prob to remove to Config if I am not gonna be too lazy
   public static readonly string ChatPrefix = $"{ChatColors.DarkBlue}[BombRequest] \u2740{ChatColors.White}";
 }
+
+// Could've used Tuple<List, Int> but using class is more readable/easier to maintain so whatever
+/*
+public class RBPlayer
+{
+  public CCSPlayerController Player { get; set; }
+  public int RoundCooldown { get; set; }
+
+  public RBPlayer(CCSPlayerController player, int roundCooldown)
+  {
+    Player = player;
+    RoundCooldown = roundCooldown;
+  }
+
+  public void DecreaseRoundCooldown()
+  {
+    if (RoundCooldown > 0)
+    {
+      RoundCooldown--;
+    }
+  }
+}
+*/
