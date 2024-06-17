@@ -111,14 +111,14 @@ public class BombRequest : BasePlugin
   private void RBOnRoundStart_Cleanup(CCSPlayerController player)
   {
     _potentialPlayers.Remove(player);
-    InformRBLoosers(_potentialPlayers);
+    InformRBLoosers();
     _potentialPlayers.Clear();
   }
-  private CCSPlayerController? CheckWhoHasBomb(List<CCSPlayerController> players)
+  private CCSPlayerController? CheckWhoHasBomb()
   {
     try
     {
-      foreach (var player in players)
+      foreach (var player in _potentialPlayers)
       {
         foreach (var weapon in player?.PlayerPawn?.Value?.WeaponServices?.MyWeapons!)
         {
@@ -197,21 +197,21 @@ public class BombRequest : BasePlugin
       Console.WriteLine("[BombRequest] Error in GiveBombToPlayer: " + ex.Message);
     }
   }
-  private CCSPlayerController? GetRandomPlayer(List<CCSPlayerController> players)
+  private CCSPlayerController? GetRandomPlayer()
   {
     try
     {
-      if (players == null || players.Count == 0) return null;
-      if (players.Count == 1) return players[0];
+      if (_potentialPlayers.Count == 0) return null;
+      if (_potentialPlayers.Count == 1) return _potentialPlayers[0];
 
-      var vipPlayers = players.Where(player => AdminManager.PlayerHasPermissions(player, "@css/vip")).ToList();
+      var vipPlayers = _potentialPlayers.Where(player => AdminManager.PlayerHasPermissions(player, "@css/vip")).ToList();
       bool prioritizeVip = false;
 
       if (vipPlayers.Count > 0) 
       {
         Random random = new Random();
         // Whether to prioritize vip's
-        prioritizeVip = vipPlayers.Count > 0 && random.Next(2) == 0;
+        prioritizeVip = random.Next(2) == 0;
       }
       
       if (prioritizeVip)
@@ -224,8 +224,8 @@ public class BombRequest : BasePlugin
       }
       
       Random randomGeneral = new Random();
-      int generalIndex = randomGeneral.Next(players.Count);
-      return players[generalIndex];
+      int generalIndex = randomGeneral.Next(_potentialPlayers.Count);
+      return _potentialPlayers[generalIndex];
     }
     catch (Exception ex)
     {
@@ -233,10 +233,10 @@ public class BombRequest : BasePlugin
       return null;
     }
   }
-  private void InformRBLoosers(List<CCSPlayerController> players)
+  private void InformRBLoosers()
   {
     if (_potentialPlayers.Count == 0) return;
-    foreach (var gamer in players)
+    foreach (var gamer in _potentialPlayers)
     {
       if (gamer.IsConnected())
       {
