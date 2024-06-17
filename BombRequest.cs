@@ -83,10 +83,10 @@ public class BombRequest : BasePlugin
   {
     if (_potentialPlayers.Count == 0) return;
     // Did check already, just give weapon_c4 won't work, there will be two bomb's then (sadly) :D
-    CCSPlayerController? targetPlayer = GetRandomPlayer(_potentialPlayers);
+    CCSPlayerController? targetPlayer = GetRandomPlayer();
     if (targetPlayer == null) return;
 
-    CCSPlayerController? bombCarrier = CheckWhoHasBomb(Lib.GetAlivePlayersT());
+    CCSPlayerController? bombCarrier = CheckWhoHasBomb();
     if (bombCarrier == targetPlayer)
     {
       TextToChat(targetPlayer, $"{ChatColors.Lime} Now that's a coincidence. You got the bomb already. Removing you from the RB list.");
