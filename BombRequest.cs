@@ -95,19 +95,26 @@ public class BombRequest : BasePlugin
       return;
     }
 
+    bool isBombRemoved = false;
     if (bombCarrier == null)
     {
-      RemoveBombFromGround();
+      isBombRemoved = RemoveBombFromGround();
     }
     else
     {
-      RemoveBombFromPlayer(bombCarrier);
+      isBombRemoved = RemoveBombFromPlayer(bombCarrier);
     }
-
-    GiveBombToPlayer(targetPlayer);
-    // 0.0.1 - Don't want that the same player participating in the next round if I just keep the list, so just clear it, so everyone can write !rb again for next round
-    // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
-    RBOnRoundStart_Cleanup(targetPlayer);
+    if (isBombRemoved)
+    {
+      GiveBombToPlayer(targetPlayer);
+      // 0.0.1 - Don't want that the same player participating in the next round if I just keep the list, so just clear it, so everyone can write !rb again for next round
+      // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
+      RBOnRoundStart_Cleanup(targetPlayer);
+    }
+    else
+    {
+      Console.WriteLine("[BombRequest] Error in RBOnRoundStart: The bomb was not removed for unknown reason");
+    }
   }
   private void RBOnRoundStart_Cleanup(CCSPlayerController player)
   {
@@ -141,13 +148,13 @@ public class BombRequest : BasePlugin
       return null;
     }
   }
-  private void RemoveBombFromGround()
+  private bool RemoveBombFromGround()
   {
     try
     {
       var bombs = Utilities.FindAllEntitiesByDesignerName<CCSWeaponBase>("weapon_c4");
       
-      if (bombs == null) return;
+      if (bombs == null) return false;
       
       foreach (var entity in bombs)
       {
@@ -156,15 +163,19 @@ public class BombRequest : BasePlugin
         if (entity.State == CSWeaponState_t.WEAPON_NOT_CARRIED)
         {
           entity.Remove();
+          return true;
         }
       }
+
+      return false;
     }
     catch (Exception ex)
     {
       Console.WriteLine("[BombRequest] Error in RemoveBombFromGround: " + ex.Message);
+      return false;
     }
   }
-  private void RemoveBombFromPlayer(CCSPlayerController player)
+  private bool RemoveBombFromPlayer(CCSPlayerController player)
   {
     try
     {
@@ -176,13 +187,16 @@ public class BombRequest : BasePlugin
           {
             Utilities.RemoveItemByDesignerName(player, weapon.Value.DesignerName);
             player.ExecuteClientCommand("slot3");
+            return true;
           }
         }
       }
+      return false;
     }
     catch (Exception ex)
     {
       Console.WriteLine("[BombRequest] Error in RemoveBombFromPlayer: " + ex.Message);
+      return false;
     }
   }
   private void GiveBombToPlayer(CCSPlayerController player)
