@@ -104,16 +104,13 @@ public class BombRequest : BasePlugin
     {
       isBombRemoved = RemoveBombFromPlayer(bombCarrier);
     }
+
     if (isBombRemoved)
     {
       GiveBombToPlayer(targetPlayer);
       // 0.0.1 - Don't want that the same player participating in the next round if I just keep the list, so just clear it, so everyone can write !rb again for next round
       // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
       RBOnRoundStart_Cleanup(targetPlayer);
-    }
-    else
-    {
-      Console.WriteLine("[BombRequest] Error in RBOnRoundStart: The bomb was not removed for unknown reason");
     }
   }
   private void RBOnRoundStart_Cleanup(CCSPlayerController player)

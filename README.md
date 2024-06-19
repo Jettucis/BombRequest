@@ -1,5 +1,6 @@
 # BombRequest
- BombRequest plugin for CS2 Dedicated servers
+ BombRequest plugin for CS2 Dedicated servers 
+ - Currently doesn't work. Waiting for new CSSharp releases.
 
 ### Commands
 - `rb` - Add's player to the list of potential players who will get the bomb on next round
