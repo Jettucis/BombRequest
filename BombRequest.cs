@@ -14,7 +14,7 @@ public class BombRequest : BasePlugin
   public override string ModuleName => "Bomb Request";
   public override string ModuleAuthor => "Jetta";
   public override string ModuleDescription => "Allows players to be the bomb carrier on the next round";
-  public override string ModuleVersion => "0.0.2a";
+  public override string ModuleVersion => "0.0.3";
 
   private List<CCSPlayerController> _potentialPlayers = new List<CCSPlayerController>();
   //private List<RBPlayer> _playersInCooldown = new List<RBPlayer>();
@@ -66,7 +66,7 @@ public class BombRequest : BasePlugin
   {
     if (_isWarmup) return HookResult.Continue;
 
-    AddTimer(1.0f, () => {
+    AddTimer(0.1f, () => {
       RBOnRoundStart();
     });
     return HookResult.Continue;
@@ -112,6 +112,12 @@ public class BombRequest : BasePlugin
       // I know, I know, I can just store rb winners in temporary list that will auto-remove them after X amount of rounds, but I just can't CBA to do it atm. :D
       RBOnRoundStart_Cleanup(targetPlayer);
     }
+    else
+    {
+      InformRBLoosers();
+      _potentialPlayers.Clear();
+      Console.WriteLine("[BombRequest] Something went terribly wrong. Bomb was not removed successfully...");
+    }
   }
   private void RBOnRoundStart_Cleanup(CCSPlayerController player)
   {
@@ -123,7 +129,8 @@ public class BombRequest : BasePlugin
   {
     try
     {
-      foreach (var player in _potentialPlayers)
+      //List<CCSPlayerController> tPlayerList = Lib.GetAlivePlayersT();
+      foreach (var player in Lib.GetAlivePlayersT())
       {
         foreach (var weapon in player?.PlayerPawn?.Value?.WeaponServices?.MyWeapons!)
         {
@@ -182,9 +189,9 @@ public class BombRequest : BasePlugin
         {
           if (weapon.Value.DesignerName.Contains("c4"))
           {
-            Utilities.RemoveItemByDesignerName(player, weapon.Value.DesignerName);
-            player.ExecuteClientCommand("slot3");
-            return true;
+            player.ExecuteClientCommand("slot5");
+            player.DropActiveWeapon();
+            return RemoveBombFromGround();
           }
         }
       }
